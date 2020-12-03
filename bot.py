@@ -1,6 +1,5 @@
 import os
-import discord
-from discord import guild
+from discord.ext import commands
 from dotenv import load_dotenv
 from words import *
 import random
@@ -9,18 +8,31 @@ import asyncio
 load_dotenv()
 
 TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('GUILD_TOKEN')
 
-client = discord.Client()
+bot = commands.Bot(command_prefix='!')
 
 
-@client.event
+@bot.event
 async def on_ready():
-    print("{0.user} is activated!".format(client))
+    print("{0.user} is activated!".format(bot))
+    print(f"Bot's Latency:{round (bot.latency * 1000)}ms")
 
-@client.event
+
+@bot.command(name='hamilton')
+async def hami(ctx):
+    await ctx.send(random.choice(hamilton_jokes))
+
+@bot.command(name='emmin arkanda')
+async def emmi(ctx):
+    await ctx.send("Maddi Manevi Her Yönden")
+    await asyncio.sleep(0.75)
+    await ctx.send("Ağzına Sıçar")
+    await asyncio.sleep(0.75)
+    await ctx.send("Hadi Öptü- B-Bir dakika! Sen bana ne dedirtiyorsun lan gerizekalı herif?!")
+
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
     if message.content == 'kendini tanıt aptal bot':
         response = "Ben ben aptal bir bot olan Christina- Sen bana aptal mı dedin seni lanet olası pislik?"
@@ -34,9 +46,6 @@ async def on_message(message):
             await message.channel.send('Haha! Çok komiksin Tuna...')
         else:
             return
-    for h in hamilton:
-        if h in message.content:
-            await message.channel.send(random.choice(hamilton_jokes))
     for t in tsun_word:
         if t in message.content:
             for a in anti_tsun:
@@ -57,13 +66,9 @@ async def on_message(message):
         await message.channel.send("https://www.youtube.com/watch?v=tOzOD-82mW0")
     if message.content == 'bruh':
         await message.channel.send("Moment...")
-    if message.content == 'emmin arkanda':
-        await message.channel.send("Maddi Manevi Her Yönden")
-        await asyncio.sleep(0.5)
-        await message.channel.send("Ağzına Sıçar")
-        await asyncio.sleep(0.5)
-        await message.channel.send("Hadi Öptü- B-Bir dakika! Sen bana ne dedirtiyorsun lan gerizekalı herif?!")
+    await bot.process_commands(message)
+
 
     
 
-client.run(TOKEN)
+bot.run(TOKEN)
