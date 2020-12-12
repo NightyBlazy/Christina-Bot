@@ -1,5 +1,5 @@
 tsun_word =['Tsundere','tsundere']
-anti_tsun =['çöp','trash','bok','shit','kaka','sevmezsin','gerizekalı','mal','stupid','salak']
+anti_tsun =['çöp','trash','bok','shit','kaka','sevmezsin','gerizekalı','mal','stupid','amk','sik','fuck','cock']
 
 hamilton_jokes = ["Hamilton da Botuna Hamilton şakaları yaptırırdı...",
 "Hamilton da korona olup kendi yerine Russel'i geçirirdi...",
@@ -21,9 +21,10 @@ hamilton_jokes = ["Hamilton da Botuna Hamilton şakaları yaptırırdı...",
 "Hamilton da birisi ona 'hehe' dediğinde 'EHE TTE NANDAYO' derdi...",
 "Hamilton da John Cena gibi 'Are you sure about that?' derdi...",
 "Hamilton da Naruto Run atardı...",
-"Hamilton da 'Tanrım, keşke yunuslar gerçek olsaydı...' derdi..."
+"Hamilton da 'Tanrım, keşke yunuslar gerçek olsaydı...' derdi...",
+"Hamildon da hamilton şakaları yapmaktan sıkılırdı...",
+"Hamilton da George'a şans vermemek için kendi koltuğuna geçerdi..."
 ]
-
 
 #Emojiler
 thumbsup = '👍'
