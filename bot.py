@@ -2,6 +2,7 @@ import os
 import asyncio
 import datetime
 import sys
+import time as ti
 
 import discord
 from discord.ext import commands
@@ -28,18 +29,18 @@ class Bot(commands.Bot):
     def __init__(self):
         super(Bot,self).__init__(command_prefix='<',help_command=None)
 
-        self.add_cog(Müzik(self))
+        self.add_cog(Music(self))
         self.add_cog(Komutlar(self))
 
     async def on_ready(self):
         print("{0.user} is activated!".format(self))
         print(f"Bot's Latency:{round (self.latency * 1000)}ms")
         print("-------------------------------")
-    
+
     async def on_message(self,message):
         if message.author == self.user:
             return
-    
+
         msg = message.content
         snd = message.channel
 
@@ -62,9 +63,10 @@ class Bot(commands.Bot):
                         await message.add_reaction(thumbsdown)
                         await message.add_reaction(anger)
                         return
-                if 'salak' in msg:
-                    await snd.send("Sen kime salak diyon lan tek hücreli şerefsiz?!")
-                    return
+                for s in tsun_baka:
+                    if s in msg:
+                        await snd.send(f"Sen nasıl '{msg}' dersin!? BAKA!")
+                        return
                 else:
                     await message.add_reaction(thumbsup)
         if msg == 'christina konuş':
@@ -75,12 +77,14 @@ class Bot(commands.Bot):
             await snd.send("https://www.youtube.com/watch?v=tOzOD-82mW0")
         if msg == 'bruh':
             await snd.send("Moment...")
-        
+
         if msg == f"@!{self.user.id}>":
             await snd.send("M-Merhaba, ben Christina bot! Komutlarımı kullanmak için '**<**' prefixini kullan.")
             await snd.send("Diğer komutlarımı öğrenmek için '**<help**' veya '**<yardım**' komutlarını kullan!")
-        
-        
+        if 'napim' in msg:
+            await snd.send("Asıl ben napim...")
+
+
         await self.process_commands(message)
 
 class Controller:
@@ -103,25 +107,25 @@ class Controller:
         while True:
             if self.now_playing:
                 await self.now_playing.delete()
-            
+
             self.next.clear()
 
             song = await self.queue.get()
             await player.play(song)
-            
+
             self.now_playing = await self.channel.send(f'**Şuanda Oynatılıyor:** `{song}`')
 
             await self.next.wait()
 
 
-class Müzik(commands.Cog):
+class Music(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
         self.controllers = {}
 
         if not hasattr(bot, 'wavelink'):
             self.bot.wavelink = wavelink.Client(bot=self.bot)
-        
+
         self.bot.loop.create_task(self.start_nodes())
     async def start_nodes(self):
         await self.bot.wait_until_ready()
@@ -149,7 +153,7 @@ class Müzik(commands.Cog):
         except KeyError:
             controller = Controller(self.bot,gid)
             self.controllers[gid] = controller
-        
+
         return controller
 
     async def cog_check(self, ctx):
@@ -173,7 +177,7 @@ class Müzik(commands.Cog):
             except AttributeError:
                 await ctx.send('Bir sesliye bağlı değilsin... Sesli chate bağlansan da beni uğraştırmasan?!')
                 raise discord.DiscordException("User is not connected any voice channel")
-                
+
         player = self.bot.wavelink.get_player(ctx.guild.id)
 
         if channel.id == player.channel_id:
@@ -184,12 +188,12 @@ class Müzik(commands.Cog):
 
         controller = self.get_controller(ctx)
         controller.channel = ctx.channel
-    
+
     @commands.command(aliases=['çal','ç','oynat'])
     async def play(self,ctx,*, query: str):
         if not RURL.match(query):
             query = f'ytsearch:{query}'
-        
+
         tracks = await self.bot.wavelink.get_tracks(f'ytsearch:{query}')
 
         if not tracks:
@@ -201,12 +205,12 @@ class Müzik(commands.Cog):
             await ctx.invoke(self.connect)
 
         track = tracks[0]
-    
+
         controller = self.get_controller(ctx)
         await controller.queue.put(track)
         await ctx.send(f'{str(track)} **oynatma listesine eklendi**')
 
-        
+
     @commands.command(aliases=['ayrıl','leave','terket'])
     async def disconnect(self,ctx):
         player = self.bot.wavelink.get_player(ctx.guild.id)
@@ -216,10 +220,12 @@ class Müzik(commands.Cog):
         except KeyError:
             await player.disconnect()
             return await ctx.send("Sen gerizekalı mısın?! Bir odaya katılmadım ki ayrılayim!")
+        if player.is_playing:
+            await player.stop()
 
         await player.disconnect()
         await ctx.send("Peki, o zaman sesliden ayrılıyorum. Z-Zaten seni sevdiğim için filan gelmemiştim tamam mı?!")
-            
+
 
     @commands.command(aliases=['s','geç','g'])
     async def skip(self,ctx):
@@ -230,7 +236,7 @@ class Müzik(commands.Cog):
 
         await ctx.send("Tamam be tamam, geçtik müziği!")
         await player.stop()
-    
+
     @commands.command(aliases=['dur','durdur','du'])
     async def pause(self,ctx):
         player = self.bot.wavelink.get_player(ctx.guild.id)
@@ -239,14 +245,14 @@ class Müzik(commands.Cog):
 
         await ctx.send("Tamamdır müziği durdurdum.")
         await player.set_pause(True)
-    
+
     @commands.command(aliases=['devam','de'])
     async def resume(self,ctx):
         player = self.bot.wavelink.get_player(ctx.guild.id)
 
         if not player.is_paused:
             return await ctx.send("Müzik zaten çalıyor gerizekalı!")
-        
+
         await ctx.send("Oh be, hiç devam ettirmiyeceksin sanmıştım... D-Devam ettirmek istediğimden filan değil tabi...")
         await player.set_pause(False)
 
@@ -256,7 +262,7 @@ class Müzik(commands.Cog):
 
         if not player.current:
             return await ctx.send("Şuan bir şey çalıyora mı benziyorum?!")
-        
+
         controller = self.get_controller(ctx)
 
         await controller.now_playing.delete()
@@ -269,7 +275,7 @@ class Müzik(commands.Cog):
 
         if not player.current or not controller.queue._queue:
             return await ctx.send("Oynatma listemde hiçbir şarkı yok ki!")
-        
+
         upcoming = list(itertools.islice(controller.queue._queue, 0, 5))
 
         fmt = '\n'.join(f'**`{str(song)}`**' for song in upcoming)
@@ -302,9 +308,21 @@ class Komutlar(commands.Cog):
         )
 
         await ctx.send(embed = help_embed)
-    
 
-
-    
 bot = Bot()
-bot.run(TOKEN)
+print("Welcome to the Christina Bot starting interface")
+print("Are You Gonna Start Her Now?")
+start = input("y/n\n")
+if start == "y":
+    print("Activating the Christina...")
+    print("Please wait while her systems are starting...")
+    bot.run(TOKEN)
+elif start == "n":
+    print("Okay... Why are you started this app then?")
+    ti.sleep(3)
+    exit()
+else:
+    print("Wrong command... I'm gonna pretend you sayed 'Yes!'...")
+    print("Activating the Christina...")
+    print("Please wait while her systems are starting...")
+    bot.run(TOKEN)

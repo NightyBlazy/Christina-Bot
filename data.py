@@ -1,5 +1,6 @@
 tsun_word =['Tsundere','tsundere']
-anti_tsun =['çöp','trash','bok','shit','kaka','sevmezsin','gerizekalı','mal','stupid','amk','sik','fuck','cock']
+anti_tsun =['çöp','trash','bok','shit','kaka','sevmezsin','amk','sik','fuck','cock','crap','โง่']
+tsun_baka =['salak','baka','aptal','gerizekalı','stupid','mal','bad','abartılıyor','馬鹿','fool','idiot']
 
 hamilton_jokes = ["Hamilton da Botuna Hamilton şakaları yaptırırdı...",
 "Hamilton da korona olup kendi yerine Russel'i geçirirdi...",
